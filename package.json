@@ -1,0 +1,47 @@
+{
+  "name": "ai-markdown-assistant",
+  "displayName": "AI Markdown Assistant",
+  "description": "Modify markdown text using Claude via AWS Bedrock",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:markdown"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "aiMarkdownAssistant.modifySelection",
+        "title": "Modify with AI"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorHasSelection && editorLangId == markdown",
+          "command": "aiMarkdownAssistant.modifySelection"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.0.0",
+    "pdf-parse": "^2.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/pdf-parse": "^1.1.5",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.0.0"
+  }
+}
