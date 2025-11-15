@@ -1,72 +1,106 @@
 import * as vscode from 'vscode';
 import { modifyTextWithClaude } from './bedrockClient';
 import { gatherFolderContext } from './contextGatherer';
+import { PromptPanel } from './promptPanel';
+
+let statusBarItem: vscode.StatusBarItem;
 
 export function activate(context: vscode.ExtensionContext) {
-  console.log('AI Markdown Assistant is now active');
+  console.log('WriteDot is now active');
+
+  // Create status bar item
+  statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+  statusBarItem.command = 'writedot.modifySelection';
+  statusBarItem.text = "$(sparkle) AI Edit";
+  statusBarItem.tooltip = "Modify selection with AI";
+  context.subscriptions.push(statusBarItem);
+
+  // Show status bar item when editing text files
+  context.subscriptions.push(
+    vscode.window.onDidChangeActiveTextEditor(updateStatusBarItem)
+  );
+  updateStatusBarItem();
 
   const command = vscode.commands.registerCommand(
-    'aiMarkdownAssistant.modifySelection',
+    'writedot.modifySelection',
     async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
         return;
       }
 
-      const selectedText = editor.document.getText(editor.selection);
+      let selectedText = editor.document.getText(editor.selection);
       if (!selectedText) {
         vscode.window.showErrorMessage('No text selected');
         return;
       }
 
+      // Store reference to the original editor and document
+      const originalEditor = editor;
+      const originalDocument = editor.document;
+
       // Get full document content
       const fullDocContent = editor.document.getText();
 
-      // Show input box for user prompt
-      const userPrompt = await vscode.window.showInputBox({
-        prompt: 'How should I modify this text?',
-        placeHolder: 'e.g., make it more concise'
-      });
+      // Show multi-line prompt panel and keep it open for multiple modifications
+      while (true) {
+        const result = await PromptPanel.getPrompt(context.extensionUri, selectedText);
 
-      if (!userPrompt) {
-        return;
-      }
+        if (!result) {
+          // User cancelled or closed the panel
+          break;
+        }
 
-      // Ask if user wants to include context
-      const includeContext = await vscode.window.showQuickPick(
-        ['No context', 'Include folder files'],
-        { placeHolder: 'Include context from folder?' }
-      );
+        const { prompt: userPrompt, includeContext } = result;
 
-      if (!includeContext) {
-        return;
-      }
+        // Use the stored editor reference instead of activeTextEditor
+        const currentSelectedText = originalEditor.document.getText(originalEditor.selection);
+        if (!currentSelectedText) {
+          vscode.window.showErrorMessage('No text selected');
+          continue;
+        }
 
-      let folderContext = '';
-      if (includeContext === 'Include folder files') {
-        folderContext = await gatherFolderContext(editor.document.uri.fsPath);
-      }
+        // Get configuration
+        const config = vscode.workspace.getConfiguration('writedot');
+        const defaultContextBehavior = config.get<string>('defaultContextBehavior', 'ask');
 
-      try {
-        let modifiedText = await vscode.window.withProgress({
-          location: vscode.ProgressLocation.Notification,
-          title: 'Modifying with Claude...'
-        }, async () => {
-          return await modifyTextWithClaude(selectedText, userPrompt, fullDocContent, folderContext);
-        });
+        let folderContext = '';
 
-        // Trim any extra whitespace/newlines
-        modifiedText = modifiedText.trim();
+        // Check if context should be included based on checkbox or config
+        if (defaultContextBehavior === 'always' || includeContext) {
+          folderContext = await gatherFolderContext(originalEditor.document.uri.fsPath);
+        }
 
-        // Replace selected text
-        await editor.edit(editBuilder => {
-          editBuilder.replace(editor.selection, modifiedText);
-        });
+        // Update full document content in case it changed
+        const currentFullDocContent = originalEditor.document.getText();
 
-        vscode.window.showInformationMessage('✓ Text modified');
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        vscode.window.showErrorMessage('Error: ' + errorMessage);
+        try {
+          let modifiedText = await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: 'Modifying with Claude...'
+          }, async () => {
+            return await modifyTextWithClaude(currentSelectedText, userPrompt, currentFullDocContent, folderContext);
+          });
+
+          // Trim any extra whitespace/newlines
+          modifiedText = modifiedText.trim();
+
+          // Replace current selection
+          await originalEditor.edit(editBuilder => {
+            editBuilder.replace(originalEditor.selection, modifiedText);
+          });
+
+          vscode.window.showInformationMessage('✓ Text modified');
+
+          // Clear the prompt input for next modification
+          PromptPanel.currentPanel?.clearPrompt();
+
+          // Update the selected text for the next iteration
+          selectedText = originalEditor.document.getText(originalEditor.selection);
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          vscode.window.showErrorMessage('Error: ' + errorMessage);
+        }
       }
     }
   );
@@ -74,4 +108,17 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(command);
 }
 
-export function deactivate() {}
+function updateStatusBarItem(): void {
+  const editor = vscode.window.activeTextEditor;
+  if (editor && editor.selection && !editor.selection.isEmpty) {
+    statusBarItem.show();
+  } else {
+    statusBarItem.hide();
+  }
+}
+
+export function deactivate() {
+  if (statusBarItem) {
+    statusBarItem.dispose();
+  }
+}

@@ -1,13 +1,16 @@
-# AI Markdown Assistant
+# WriteDot
 
-A VS Code extension that modifies selected markdown text using Claude via AWS Bedrock.
+A VS Code extension that modifies selected text in any file using Claude via AWS Bedrock.
 
 ## Features
 
-- Modify selected text in markdown files using natural language prompts
-- Full document context is automatically included for better results
-- Optional folder context (includes other files in the same directory)
-- Supports multiple file types: `.md`, `.txt`, `.html`, `.json`, `.pdf`, and more
+- ✨ **Multi-line prompt input** - Use a dedicated panel for complex, multi-line prompts
+- 📝 **Works with any text file** - Not limited to markdown files
+- 🎯 **Full document context** - Automatically includes the entire document for better results
+- 📁 **Optional folder context** - Include other files in the same directory (supports `.md`, `.txt`, `.html`, `.json`, `.pdf`, and many more)
+- ⚙️ **Configurable settings** - Customize AWS region, model ID, max tokens, and default behavior
+- ⌨️ **Keyboard shortcut** - Quick access via `Cmd+Shift+M` (Mac) or `Ctrl+Shift+M` (Windows/Linux)
+- 📊 **Status bar integration** - Quick access button appears when text is selected
 
 ## Prerequisites
 
@@ -23,8 +26,8 @@ A VS Code extension that modifies selected markdown text using Claude via AWS Be
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/piezox/SmartEditor.git
-   cd SmartEditor
+   git clone https://github.com/piezox/WriteDot.git
+   cd WriteDot
    ```
 
 2. Install dependencies:
@@ -63,21 +66,44 @@ A VS Code extension that modifies selected markdown text using Claude via AWS Be
 
 ## Usage
 
-1. Open a markdown (`.md`) file in VS Code
+### Method 1: Right-click menu
+1. Open any text file in VS Code
 2. Select the text you want to modify
-3. Right-click on the selection
-4. Click **"Modify with AI"**
-5. Enter your modification prompt (e.g., "make it more concise", "fix grammar", "translate to Spanish")
-6. Choose whether to include context from other files in the folder
-7. The selected text will be replaced with the AI-modified version
+3. Right-click on the selection → **"WriteDot: Modify with AI"**
+
+### Method 2: Keyboard shortcut
+1. Select the text you want to modify
+2. Press `Cmd+Shift+M` (Mac) or `Ctrl+Shift+M` (Windows/Linux)
+
+### Method 3: Status bar
+1. Select the text you want to modify
+2. Click the **"✨ AI Edit"** button in the status bar
+
+### Workflow
+
+1. A prompt panel will open beside your editor where you can enter your modification instructions
+2. Multi-line prompts are supported - use `Cmd+Enter` or `Ctrl+Enter` to submit
+3. Choose whether to include context from other files in the folder (optional checkbox)
+4. The selected text will be replaced with the AI-modified version
+5. The panel stays open for multiple sequential modifications - just keep selecting text and submitting new prompts!
+
+**Example prompts:**
+- "make it more concise"
+- "fix grammar and spelling"
+- "translate to Spanish"
+- "rewrite in a professional tone"
+- "add code comments"
 
 ## Configuration
 
-The extension uses AWS Bedrock with the following defaults:
-- **Region**: `us-west-2`
-- **Model**: `global.anthropic.claude-sonnet-4-5-20250929-v1:0` (Claude Sonnet 4.5)
+Go to VS Code Settings → Extensions → WriteDot to configure:
 
-To modify these settings, edit [`src/bedrockClient.ts`](src/bedrockClient.ts).
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `awsRegion` | `us-west-2` | AWS region for Bedrock API calls |
+| `modelId` | `global.anthropic.claude-sonnet-4-5-20250929-v1:0` | Bedrock model ID to use |
+| `maxTokens` | `4096` | Maximum tokens in the response |
+| `defaultContextBehavior` | `ask` | Default behavior for folder context (`ask`, `always`, or `never`) |
 
 ## Supported File Types for Context
 
@@ -94,11 +120,12 @@ When including folder context, the extension reads these file types:
 ### Project Structure
 
 ```
-SmartEditor/
+WriteDot/
 ├── src/
 │   ├── extension.ts         # Main extension logic
 │   ├── bedrockClient.ts     # AWS Bedrock/Claude integration
-│   └── contextGatherer.ts   # File context gathering
+│   ├── contextGatherer.ts   # File context gathering
+│   └── promptPanel.ts       # Multi-line prompt input panel
 ├── out/                     # Compiled JavaScript
 ├── package.json            # Extension manifest
 └── tsconfig.json          # TypeScript configuration
@@ -113,6 +140,46 @@ npm run compile
 ### Debugging
 
 Press `F5` in VS Code to launch the Extension Development Host with debugging enabled.
+
+## Future Developments
+
+The following features are planned for future releases:
+
+### Prompt History
+- Save recent prompts for easy reuse
+- Quick access to frequently used modification commands
+- Prompt templates for common tasks
+
+### Multiple Commands
+Add quick commands for common modifications:
+- "Fix Grammar"
+- "Make Concise"
+- "Translate to..."
+- "Improve Writing"
+- "Add Documentation"
+
+### Diff Preview
+- Show a side-by-side diff before applying changes
+- Accept/reject changes before replacement
+- Undo/redo support
+
+### Enhanced Error Handling
+- Better error messages for AWS credential issues
+- Rate limit detection and handling
+- Retry logic for transient failures
+
+### Testing
+- Unit tests for core functionality
+- Integration tests for AWS Bedrock calls
+- End-to-end extension tests
+
+### Additional Features
+- Support for streaming responses
+- Cost estimation before making API calls
+- Usage analytics and tracking
+- Multiple AI model support (beyond Claude)
+
+Contributions and feature requests are welcome! Please open an issue on GitHub to discuss.
 
 ## License
 

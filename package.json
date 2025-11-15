@@ -1,7 +1,7 @@
 {
-  "name": "ai-markdown-assistant",
-  "displayName": "AI Markdown Assistant",
-  "description": "Modify markdown text using Claude via AWS Bedrock",
+  "name": "writedot",
+  "displayName": "WriteDot",
+  "description": "Modify text using Claude via AWS Bedrock",
   "version": "0.1.0",
   "engines": {
     "vscode": "^1.85.0"
@@ -10,23 +10,86 @@
     "Other"
   ],
   "activationEvents": [
-    "onLanguage:markdown"
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "aiMarkdownAssistant.modifySelection",
-        "title": "Modify with AI"
+        "command": "writedot.modifySelection",
+        "title": "WriteDot: Modify with AI",
+        "icon": "$(sparkle)"
       }
     ],
     "menus": {
       "editor/context": [
         {
-          "when": "editorHasSelection && editorLangId == markdown",
-          "command": "aiMarkdownAssistant.modifySelection"
+          "when": "editorHasSelection",
+          "command": "writedot.modifySelection",
+          "group": "1_modification"
+        }
+      ],
+      "editor/title": [
+        {
+          "when": "editorHasSelection",
+          "command": "writedot.modifySelection",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "writedot.modifySelection",
+          "when": "editorHasSelection"
         }
       ]
+    },
+    "keybindings": [
+      {
+        "command": "writedot.modifySelection",
+        "key": "ctrl+shift+m",
+        "mac": "cmd+shift+m",
+        "when": "editorTextFocus && editorHasSelection"
+      }
+    ],
+    "configuration": {
+      "title": "WriteDot",
+      "properties": {
+        "writedot.awsRegion": {
+          "type": "string",
+          "default": "us-west-2",
+          "description": "AWS region for Bedrock API calls",
+          "enum": ["us-east-1", "us-west-2", "eu-west-1", "ap-southeast-1"],
+          "enumDescriptions": [
+            "US East (N. Virginia)",
+            "US West (Oregon)",
+            "Europe (Ireland)",
+            "Asia Pacific (Singapore)"
+          ]
+        },
+        "writedot.modelId": {
+          "type": "string",
+          "default": "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+          "description": "Bedrock model ID to use for text modification"
+        },
+        "writedot.maxTokens": {
+          "type": "number",
+          "default": 4096,
+          "description": "Maximum number of tokens in the response",
+          "minimum": 256,
+          "maximum": 8192
+        },
+        "writedot.defaultContextBehavior": {
+          "type": "string",
+          "default": "ask",
+          "description": "Default behavior for including folder context",
+          "enum": ["ask", "always", "never"],
+          "enumDescriptions": [
+            "Ask each time",
+            "Always include folder files",
+            "Never include folder files"
+          ]
+        }
+      }
     }
   },
   "scripts": {
