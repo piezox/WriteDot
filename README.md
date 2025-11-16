@@ -14,55 +14,13 @@ A VS Code extension that modifies selected text in any file using Claude via AWS
 
 ## Prerequisites
 
-- VS Code 1.85.0 or higher
-- Node.js and npm
 - AWS account with Bedrock access
 - AWS credentials configured (`~/.aws/credentials`)
-- Access to Claude Sonnet 4.5 model in AWS Bedrock (us-west-2 region)
+- Access to Claude Sonnet 4.5 model in AWS Bedrock
 
 ## Installation
 
-### Option 1: Install from source
-
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/piezox/WriteDot.git
-   cd WriteDot
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Compile the extension:
-   ```bash
-   npm run compile
-   ```
-
-4. Open the project in VS Code:
-   ```bash
-   code .
-   ```
-
-5. Press `F5` to launch the Extension Development Host
-
-### Option 2: Package and install
-
-1. Install vsce (VS Code Extension packager):
-   ```bash
-   npm install -g @vscode/vsce
-   ```
-
-2. Package the extension:
-   ```bash
-   vsce package
-   ```
-
-3. Install the `.vsix` file:
-   - In VS Code, go to Extensions view
-   - Click the `...` menu → "Install from VSIX..."
-   - Select the generated `.vsix` file
+Install directly from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=StefMarzani.writedot) or search for "WriteDot" in the Extensions view (`Cmd+Shift+X` / `Ctrl+Shift+X`).
 
 ## Usage
 
@@ -115,31 +73,13 @@ When including folder context, the extension reads these file types:
 
 **Code**: `.js`, `.ts`, `.jsx`, `.tsx`, `.py`, `.java`, `.c`, `.cpp`, `.h`, `.css`, `.scss`
 
-## Development
+## Troubleshooting
 
-### Project Structure
+**Extension fails to activate**: Make sure AWS credentials are properly configured and you have access to Claude on Bedrock.
 
-```
-WriteDot/
-├── src/
-│   ├── extension.ts         # Main extension logic
-│   ├── bedrockClient.ts     # AWS Bedrock/Claude integration
-│   ├── contextGatherer.ts   # File context gathering
-│   └── promptPanel.ts       # Multi-line prompt input panel
-├── out/                     # Compiled JavaScript
-├── package.json            # Extension manifest
-└── tsconfig.json          # TypeScript configuration
-```
+**Model not found error**: Verify you have access to Claude Sonnet 4.5 in the us-west-2 region.
 
-### Building
-
-```bash
-npm run compile
-```
-
-### Debugging
-
-Press `F5` in VS Code to launch the Extension Development Host with debugging enabled.
+**Text not replacing correctly**: Make sure you have text selected before running the command.
 
 ## Future Developments
 
@@ -181,18 +121,49 @@ Add quick commands for common modifications:
 
 Contributions and feature requests are welcome! Please open an issue on GitHub to discuss.
 
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/piezox/WriteDot).
+
+### Development Setup
+
+If you want to contribute to WriteDot:
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/piezox/WriteDot.git
+   cd WriteDot
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Compile the extension:
+
+   ```bash
+   npm run compile
+   ```
+
+4. Press `F5` in VS Code to launch the Extension Development Host with debugging enabled.
+
+### Project Structure
+
+```text
+WriteDot/
+├── src/
+│   ├── extension.ts         # Main extension logic
+│   ├── bedrockClient.ts     # AWS Bedrock/Claude integration
+│   ├── contextGatherer.ts   # File context gathering
+│   └── promptPanel.ts       # Multi-line prompt input panel
+├── out/                     # Compiled JavaScript
+├── package.json            # Extension manifest
+└── tsconfig.json          # TypeScript configuration
+```
+
 ## License
 
 MIT
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request.
-
-## Troubleshooting
-
-**Extension fails to activate**: Make sure AWS credentials are properly configured and you have access to Claude on Bedrock.
-
-**Model not found error**: Verify you have access to Claude Sonnet 4.5 in the us-west-2 region.
-
-**Text not replacing correctly**: Make sure you have text selected before running the command.

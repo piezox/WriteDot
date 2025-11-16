@@ -2,7 +2,8 @@
   "name": "writedot",
   "displayName": "WriteDot",
   "description": "Modify text using Claude via AWS Bedrock",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "icon": "writedot-icon.png",
   "publisher": "StefMarzani",
   "author": {
     "name": "Stef Marzani"
