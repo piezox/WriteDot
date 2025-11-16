@@ -3,6 +3,28 @@
   "displayName": "WriteDot",
   "description": "Modify text using Claude via AWS Bedrock",
   "version": "0.1.0",
+  "publisher": "StefMarzani",
+  "author": {
+    "name": "Stef Marzani"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/piezox/WriteDot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/piezox/WriteDot/issues"
+  },
+  "homepage": "https://github.com/piezox/WriteDot#readme",
+  "keywords": [
+    "ai",
+    "claude",
+    "bedrock",
+    "text-editing",
+    "markdown",
+    "writing",
+    "translation"
+  ],
   "engines": {
     "vscode": "^1.85.0"
   },
