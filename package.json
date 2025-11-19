@@ -2,7 +2,7 @@
   "name": "writedot",
   "displayName": "WriteDot",
   "description": "Modify text using Claude via AWS Bedrock",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "icon": "writedot-icon.png",
   "publisher": "StefMarzani",
   "author": {
@@ -35,7 +35,7 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
@@ -81,7 +81,12 @@
           "type": "string",
           "default": "us-west-2",
           "description": "AWS region for Bedrock API calls",
-          "enum": ["us-east-1", "us-west-2", "eu-west-1", "ap-southeast-1"],
+          "enum": [
+            "us-east-1",
+            "us-west-2",
+            "eu-west-1",
+            "ap-southeast-1"
+          ],
           "enumDescriptions": [
             "US East (N. Virginia)",
             "US West (Oregon)",
@@ -105,7 +110,11 @@
           "type": "string",
           "default": "ask",
           "description": "Default behavior for including folder context",
-          "enum": ["ask", "always", "never"],
+          "enum": [
+            "ask",
+            "always",
+            "never"
+          ],
           "enumDescriptions": [
             "Ask each time",
             "Always include folder files",
@@ -116,9 +125,12 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./"
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out"
   },
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.0.0",
@@ -128,6 +140,9 @@
     "@types/node": "^20.0.0",
     "@types/pdf-parse": "^1.1.5",
     "@types/vscode": "^1.85.0",
-    "typescript": "^5.0.0"
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.0.0",
+    "webpack": "^5.103.0",
+    "webpack-cli": "^6.0.1"
   }
 }
